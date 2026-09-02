@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TravelPilot</title>
+  <link rel="stylesheet" href="/app.css" />
+</head>
+<body>
+  <div class="app">
+    <header class="header">
+      <a class="logo" href="/"><span>✦</span> TravelPilot</a>
+      <nav class="tabs" aria-label="Application sections">
+        <button class="tab active" data-tab="chat" type="button">Chat</button>
+        <button class="tab" data-tab="trips" type="button">My trips</button>
+        <button class="tab" data-tab="saved" type="button">Saved</button>
+      </nav>
+      <div class="profile">PD</div>
+    </header>
+
+    <main class="chat-page">
+      <section class="chat-window" aria-label="TravelPilot chat">
+        <div class="chat-title">
+          <div class="bot-icon">✦</div>
+          <div><h1>TravelPilot</h1><p>Your travel planning assistant</p></div>
+          <span class="status"><i></i> Ready</span>
+        </div>
+
+        <div class="messages" id="messages">
+          <div class="welcome">
+            <div class="welcome-icon">✦</div>
+            <h2>Where would you like to go?</h2>
+            <p>Ask me to find flights, hotels, or build an itinerary.</p>
+          </div>
+          <div class="message assistant"><div class="message-avatar">✦</div><div><span class="message-name">TravelPilot</span><p>Hi Prashant! Tell me about your trip and I’ll help you plan it.</p></div></div>
+        </div>
+
+        <div class="suggestions">
+          <button type="button" data-prompt="Find me a trip to Tokyo">Find a trip</button>
+          <button type="button" data-prompt="Find flights and hotels">Flights & hotels</button>
+          <button type="button" data-prompt="Help me plan an itinerary">Plan an itinerary</button>
+        </div>
+        <form class="composer" id="chat-form">
+          <input id="chat-input" type="text" autocomplete="off" placeholder="Message TravelPilot..." />
+          <button type="submit" aria-label="Send message">↑</button>
+        </form>
+        <p class="disclaimer">TravelPilot can make mistakes. Verify important travel details.</p>
+      </section>
+    </main>
+  </div>
+  <script src="/app.js"></script>
+</body>
+</html>
