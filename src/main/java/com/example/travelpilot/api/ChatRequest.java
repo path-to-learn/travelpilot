@@ -1,5 +1,6 @@
 package com.example.travelpilot.api;
 
 public record ChatRequest(
-    String conversationId,
-    String message ) {}
+        String conversationId,
+        String message) {
+}
