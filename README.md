@@ -1,6 +1,6 @@
 # TravelPilot
 
-TravelPilot is a Java and Spring Boot travel-planning assistant. It currently provides a simple chat UI backed by a LangChain4j AI Service. The application uses Ollama by default, so local development does not require an OpenAI API key or paid LLM usage.
+TravelPilot is a Java and Spring Boot travel-planning assistant. It currently provides a chat UI backed by a LangChain4j AI Service with flight and hotel search tools. The application uses Ollama with Qwen3 by default, so local development does not require an OpenAI API key or paid LLM usage.
 
 This project is being built as a learning project for:
 
@@ -19,11 +19,14 @@ The current vertical slice contains:
 - A Spring Boot REST API at `POST /api/v1/chat`
 - A browser-based chat interface served by Spring Boot
 - A LangChain4j `@AiService` named `TravelPlannerAgent`
-- Ollama configured through the `ollama` Spring profile
+- Ollama configured through the `ollama` Spring profile with the Qwen3 model
+- LangChain4j `@Tool` methods for flight and hotel searches
+- Deterministic in-memory mock flight and hotel providers behind `FlightSearchPort` and `HotelSearchPort`
+- Typed travel-domain records for search criteria, results, and future travel plans
 - An optional OpenAI profile for later provider comparison
 - A PostgreSQL Docker Compose definition prepared for future memory and vector-search work
 
-The application does not yet search live flights or hotels, persist conversations, or make bookings. Those capabilities will be added incrementally through typed tools and provider adapters.
+The application does not call live flight or hotel APIs, persist conversations, or make bookings. Its current tools search deterministic mock inventory; live provider adapters, memory, and booking workflows will be added incrementally.
 
 ## Prerequisites
 
@@ -66,18 +69,21 @@ ollama serve
 
 If the Ollama desktop application is already running, its server may already be active and this command is not required.
 
-Download the model used by the application:
+Download the tool-capable model used by the application:
 
 ```bash
-ollama pull gemma3
+ollama pull qwen3
 ```
 
 You can verify the model and test it directly:
 
 ```bash
 ollama list
-ollama run gemma3
+ollama show qwen3
+ollama run qwen3
 ```
+
+The application uses Ollama's OpenAI-compatible API. Qwen3 is required for the current tool-calling flow; a model that does not support tools will cause Ollama to return a `400 Bad Request` error.
 
 ## Start the application
 
@@ -136,7 +142,7 @@ The chat endpoint accepts a conversation ID and message:
 ```bash
 curl -X POST http://localhost:8080/api/v1/chat \
   -H 'Content-Type: application/json' \
-  -d '{"conversationId":"demo-1","message":"Plan a three-day trip to Tokyo"}'
+  -d '{"conversationId":"demo-1","message":"Find a flight from SFO to Tokyo on 2026-10-10 and a hotel in Shibuya from 2026-10-10 to 2026-10-13 under 250 USD per night"}'
 ```
 
 Example response:
@@ -180,8 +186,18 @@ ollama list
 Download the configured model:
 
 ```bash
-ollama pull gemma3
+ollama pull qwen3
 ```
+
+### `does not support tools`
+
+The current TravelPilot agent exposes flight and hotel search functions. Ensure that Ollama is using a tool-capable model and that the configured model name matches the model you downloaded:
+
+```bash
+ollama show qwen3
+```
+
+If the model does not list tool support, update the model or use the OpenAI profile.
 
 ### `release version 21 not supported`
 
@@ -207,14 +223,18 @@ ChatController
       |
 TravelAssistant
       |
-Agentic workflow / LangGraph4j
-      |---- Travel tools and typed service ports
-      |---- Conversation memory
-      |---- RAG and vector search
-      |---- MCP tools
+TravelPlannerAgent (@AiService)
+      +---- TravelSearchTools (@Tool)
+      |       +---- FlightSearchPort -> MockFlightProvider
+      |       +---- HotelSearchPort  -> MockHotelProvider
+      +---- Future agentic workflow / LangGraph4j
+      +---- Conversation memory
+      +---- RAG and vector search
+      +---- MCP tools
       |
-Ollama or another configurable ChatModel provider
+Ollama/Qwen3 or another configurable ChatModel provider
 ```
 
-Live flight and hotel integrations will be introduced behind interfaces such as `FlightSearchPort` and `HotelSearchPort`. This keeps the agent independent of any particular external provider and allows mock data to be used for tests and local development.
+Live flight and hotel integrations will be introduced behind `FlightSearchPort` and `HotelSearchPort`. This keeps the agent independent of any particular external provider and allows deterministic mock data to be used for tests and local development.
 
+Docker Compose currently defines the PostgreSQL development container only; application-image packaging will be added in a later milestone.
