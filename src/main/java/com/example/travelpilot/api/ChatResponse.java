@@ -1,5 +1,6 @@
 package com.example.travelpilot.api;
 
-public record ChatResponse(String conversationId, String chatResponse) {
+import com.example.travelpilot.domain.TravelPlan;
 
+public record ChatResponse(String conversationId, TravelPlan travelPlan) {
 }

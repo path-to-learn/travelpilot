@@ -19,6 +19,7 @@ The current vertical slice contains:
 - A Spring Boot REST API at `POST /api/v1/chat`
 - A browser-based chat interface served by Spring Boot
 - A LangChain4j `@AiService` named `TravelPlannerAgent`
+- A structured `TravelPlan` response returned by the chat API
 - Ollama configured through the `ollama` Spring profile with the Qwen3 model
 - LangChain4j `@Tool` methods for flight and hotel searches
 - Deterministic in-memory mock flight and hotel providers behind `FlightSearchPort` and `HotelSearchPort`
@@ -150,7 +151,16 @@ Example response:
 ```json
 {
   "conversationId": "demo-1",
-  "chatResponse": "..."
+  "travelPlan": {
+    "status": "READY",
+    "summary": "...",
+    "clarificationQuestion": null,
+    "recommendedFlights": [],
+    "recommendedHotels": [],
+    "assumptions": [],
+    "warnings": [],
+    "bookingRequired": false
+  }
 }
 ```
 

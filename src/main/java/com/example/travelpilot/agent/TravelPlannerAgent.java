@@ -1,10 +1,17 @@
 package com.example.travelpilot.agent;
 
+import com.example.travelpilot.domain.TravelPlan;
+
 import dev.langchain4j.service.SystemMessage;
 import dev.langchain4j.service.UserMessage;
-import dev.langchain4j.service.spring.AiService;
 
-@AiService
+/**
+ * Learning note: adding {@code @AiService} here would ask the LangChain4j
+ * Spring Boot starter to create this proxy automatically. This project builds
+ * the same proxy explicitly in
+ * {@code TravelPilotAiConfiguration#travelPlannerAgent(ChatModel, TravelSearchTools)}
+ * so that its model, tools, and tool-call limit are visible in one place.
+ */
 public interface TravelPlannerAgent {
      
     @SystemMessage("""
@@ -19,7 +26,10 @@ public interface TravelPlannerAgent {
         If passenger or guest count is not specified, assume one and state that assumption.
         Do not claim that a booking was made.
         The available tools only search; they cannot book or hold anything.
+        Return a TravelPlan object. Use NEEDS_CLARIFICATION when required trip
+        details are missing, NO_RESULTS when the search tools return no matches,
+        and READY when suitable options are available.
         """)
-    String chat(@UserMessage String message);
+    TravelPlan chat(@UserMessage String message);
 
 }
